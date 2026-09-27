@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Bodhi-Panya Engine v4.0 | แดชบอร์ดเตรียมสอบสาธิต มช. - น้องปฐพี</title>
+  <style>
+    :root {
+      --bg-core: #0d1117;
+      --bg-panel: #161b22;
+      --border-panel: #30363d;
+      --accent-gold: #d29922;
+      --accent-blue: #58a6ff;
+      --accent-green: #3fb950;
+      --accent-red: #f85149;
+      --text-main: #c9d1d9;
+      --text-muted: #8b949e;
+      --font-code: "Consolas", "Courier New", monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      touch-action: manipulation;
+    }
+
+    body {
+      background-color: var(--bg-core);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      padding: 16px;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 850px;
+      margin: 0 auto;
+    }
+
+    /* Header Bar */
+    header {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-panel);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .brand h1 {
+      font-size: 1.15rem;
+      color: var(--accent-gold);
+      letter-spacing: 0.5px;
+    }
+
+    .brand p {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .mantra-badge {
+      font-family: var(--font-code);
+      background: rgba(210, 153, 34, 0.15);
+      color: var(--accent-gold);
+      border: 1px solid var(--accent-gold);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: bold;
+    }
+
+    /* Status Grid */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .card {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-panel);
+      border-radius: 8px;
+      padding: 14px;
+    }
+
+    .card-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .card-value {
+      font-size: 1.25rem;
+      font-weight: bold;
+      color: var(--accent-blue);
+    }
+
+    /* Simulation Canvas & Progress */
+    .sim-panel {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-panel);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .bar-container {
+      background: #21262d;
+      border-radius: 6px;
+      height: 12px;
+      overflow: hidden;
+      margin: 8px 0;
+    }
+
+    .bar-fill {
+      background: linear-gradient(90deg, var(--accent-blue), var(--accent-green));
+      height: 100%;
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+
+    /* Question Panel */
+    .quiz-panel {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-panel);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .badge-subject {
+      display: inline-block;
+      background: rgba(88, 166, 255, 0.15);
+      color: var(--accent-blue);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      margin-bottom: 10px;
+    }
+
+    .question-text {
+      font-size: 1.05rem;
+      font-weight: 500;
+      margin-bottom: 16px;
+      line-height: 1.6;
+    }
+
+    .options-grid {
+      display: grid;
+      gap: 10px;
+    }
+
+    .option-btn {
+      background: #21262d;
+      border: 1px solid var(--border-panel);
+      color: var(--text-main);
+      padding: 12px 16px;
+      border-radius: 6px;
+      text-align: left;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      background: #30363d;
+      border-color: var(--accent-blue);
+    }
+
+    /* Dharma Insight Console (Terminal Output) */
+    .insight-panel {
+      background: #05080c;
+      border: 1px solid var(--border-panel);
+      border-radius: 8px;
+      padding: 16px;
+      font-family: var(--font-code);
+      font-size: 0.85rem;
+      display: none;
+      margin-bottom: 16px;
+    }
+
+    .insight-panel.active {
+      display: block;
+    }
+
+    .terminal-header {
+      color: var(--accent-gold);
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+
+    .terminal-body {
+      white-space: pre-wrap;
+      line-height: 1.5;
+    }
+
+    .action-btn {
+      margin-top: 14px;
+      background: var(--accent-blue);
+      color: #0d1117;
+      border: none;
+      padding: 10px 18px;
+      font-weight: bold;
+      border-radius: 4px;
+      cursor: pointer;
+      display: none;
+    }
+
+    .action-btn:hover {
+      opacity: 0.9;
+    }
+
+    /* Completion Summary Panel */
+    .summary-panel {
+      display: none;
+      background: var(--bg-panel);
+      border: 1px solid var(--border-panel);
+      border-radius: 8px;
+      padding: 24px;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .summary-panel.active {
+      display: block;
+    }
+
+    .summary-title {
+      font-size: 1.4rem;
+      color: var(--accent-gold);
+      margin-bottom: 12px;
+    }
+
+    .summary-desc {
+      color: var(--text-muted);
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    .reset-btn {
+      background: var(--accent-green);
+      color: #0d1117;
+      border: none;
+      padding: 10px 20px;
+      font-weight: bold;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 24px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Header: Lineage & Identity -->
+  <header>
+    <div class="brand">
+      <h1>🧬 BODHI-PANYA ENGINE v4.0</h1>
+      <p>ระบบเรียนรู้สาธิต มช. เพื่อ น้องปฐพีคุณ อินชัย</p>
+    </div>
+    <div class="mantra-badge">สัมปติจฉามิ</div>
+  </header>
+
+  <!-- Status Dashboard -->
+  <div class="dashboard-grid">
+    <div class="card">
+      <div class="card-title">ฐานข้อมูลเป้าหมาย</div>
+      <div class="card-value">สาธิต มช. (ม.1)</div>
+    </div>
+    <div class="card">
+      <div class="card-title">ระดับสมาธิและปัญญา (Bodhi XP)</div>
+      <div class="card-value" id="bodhi-score">0 XP</div>
+    </div>
+    <div class="card">
+      <div class="card-title">สภาวะจิตใจ</div>
+      <div class="card-value" id="mind-state" style="color: var(--accent-green);">สติมั่นคง</div>
+    </div>
+  </div>
+
+  <!-- Adaptive Gauge Panel -->
+  <div class="sim-panel">
+    <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted);">
+      <span>ความก้าวหน้าการสะสมปัญญา</span>
+      <span id="progress-percent">0%</span>
+    </div>
+    <div class="bar-container">
+      <div class="bar-fill" id="progress-bar"></div>
+    </div>
+  </div>
+
+  <!-- Interactive Quiz Engine -->
+  <div class="quiz-panel" id="quiz-container">
+    <span class="badge-subject" id="subject-badge">วิชา: วิทยาศาสตร์ประยุกต์</span>
+    <div class="question-text" id="question-label">กำลังเตรียมการประมวลผล...</div>
+    <div class="options-grid" id="options-box"></div>
+  </div>
+
+  <!-- Dharma Insight Console: โอสถรักษาใจและปัญญา -->
+  <div class="insight-panel" id="insight-console">
+    <div class="terminal-header">> BODHI_DIAGNOSTIC_INSIGHT:</div>
+    <div class="terminal-body" id="insight-text"></div>
+    <button class="action-btn" id="next-action" onclick="loadNextQuestion()">เข้าสู่ข้อถัดไปด้วยจิตสงบ ➔</button>
+  </div>
+
+  <!-- Summary Report Card -->
+  <div class="summary-panel" id="summary-box">
+    <div class="summary-title">✨ บรรลุการประเมินปัญญาเรียบร้อยบริบูรณ์ ✨</div>
+    <div class="summary-desc" id="summary-stats"></div>
+    <button class="reset-btn" onclick="restartQuiz()">เริ่มต้นฝึกฝนสติรอบใหม่อีกครั้ง</button>
+  </div>
+
+  <footer>
+    น้อมถวายบูชาพระคุณ หลวงพ่อฤาษีลิงดำ (วัดท่าซุง) & ครูบาอาจารย์ มทร.ล้านนา<br>
+    BODHI-PANYA UNIVERSAL VESSEL • สัมปติจฉามิ
+  </footer>
+</div>
+
+<script>
+  /* ==========================================================================
+     ENGINE DATA & LOGIC CORE
+     ========================================================================== */
+  const examPool = [
+    {
+      subject: "คณิตศาสตร์ประยุกต์ (การคำนวณปริมาตรและอัตราการไหล)",
+      q: "ถ้าถังน้ำทรงสี่เหลี่ยมมุมฉาก กว้าง 4 เมตร ยาว 5 เมตร สูง 2 เมตร เปิดน้ำใส่ด้วยอัตราเร็ว 500 ลิตรต่อนาที จะต้องใช้เวลานานเท่าใดน้ำจึงจะเต็มถังพอดี? (1 ลบ.ม. = 1,000 ลิตร)",
+      options: [
+        "60 นาที",
+        "80 นาที",
+        "100 นาที",
+        "120 นาที"
+      ],
+      correct: 1, // 80 นาที
+      metaphorSuccess: "ยอดเยี่ยมมากน้องปฐพี! ปริมาตร = 4 x 5 x 2 = 40 ลบ.ม. (40,000 ลิตร) หารด้วย 500 ลิตรต่อนาที = 80 นาที\n[ธรรมะอุปมา]: เสมือนการสะสมบารมีและความดีทีละหยด แม้ใช้เวลา 80 นาที หากน้ำไม่รั่วซึม (มีสติคุมจิต) ถังก็เต็มเปี่ยมได้บริบูรณ์",
+      metaphorFail: "ไม่เป็นไรเลยลูก ตั้งสติใหม่นะ:\n1. หาความจุถังก่อน: กว้าง x ยาว x สูง = 4 x 5 x 2 = 40 ลูกบาศก์เมตร\n2. แปลงเป็นลิตร: 40 x 1,000 = 40,000 ลิตร\n3. คำนวณเวลา: 40,000 ÷ 500 = 80 นาที\n[ธรรมะอุปมา]: ความผิดพลาดเป็นปุ๋ยแห่งปัญญา พระพุทธองค์สอนให้มีขันติและอุเบกขา ค่อยๆ คิดทีละขั้นแล้วเราจะสว่างไสว"
+    },
+    {
+      subject: "วิทยาศาสตร์เชิงเหตุผล (การสังเกตชีววิทยาพืช)",
+      q: "เมื่อนำถุงพลาสติกใสครอบใบไม้ของต้นไม้ต้นหนึ่งที่ได้รับแสงแดดจัดเป็นเวลา 2 ชั่วโมง แล้วสังเกตพบละอองน้ำเกาะอยู่ด้านในถุง ปรากฏการณ์นี้เกิดขึ้นจากกระบวนการใดของพืชเป็นหลัก?",
+      options: [
+        "การสังเคราะห์ด้วยแสง (Photosynthesis)",
+        "การคายน้ำ (Transpiration)",
+        "การหายใจระดับเซลล์ (Cellular Respiration)",
+        "การลำเลียงอาหารทางโฟลเอ็ม (Translocation)"
+      ],
+      correct: 1, // การคายน้ำ
+      metaphorSuccess: "แม่นยำมากครับ! พืชคายน้ำออกทางปากใบเพื่อลดอุณหภูมิและช่วยดูดลำเลียงแร่ธาตุ\n[ธรรมะอุปมา]: เหมือนจิตใจที่รู้จักการสละออก (ทาน) จิตที่ปล่อยวางความร้อนรุ่ม ย่อมเปิดรับคุณธรรมใหม่ๆ เข้ามาหล่อเลี้ยงชีวิตได้เสมอ",
+      metaphorFail: "จุดสังเกตสำคัญคือน้ำที่ระเหยออกมา:\nการสังเคราะห์ด้วยแสงผลิตน้ำตาลและออกซิเจน แต่ละอองน้ำที่สะสมจนเห็นได้ชัดมาจาก 'การคายน้ำทางปากใบ'\n[ธรรมะอุปมา]: สิ่งที่เห็นภายนอกต้องมองลึกไปถึงเหตุปัจจัย เมื่อรู้สมุทัย (เหตุของสิ่งนั้น) ปัญญาก็จะคลี่คลาย"
+    },
+    {
+      subject: "คณิตศาสตร์ประยุกต์ (ร้อยละและกำไรขาดทุน)",
+      q: "ร้านค้าติดป้ายราคากล้องส่องทางไกลไว้ 2,500 บาท ต่อมาติดป้ายลดราคา 20% แต่ถ้าลูกค้าจ่ายเงินสดจะลดเพิ่มอีก 10% จากราคาที่ลดแล้ว หากซื้อด้วยเงินสดจะต้องจ่ายเงินกี่บาท?",
+      options: [
+        "1,750 บาท",
+        "1,800 บาท",
+        "1,850 บาท",
+        "1,900 บาท"
+      ],
+      correct: 1, // 1,800 บาท
+      metaphorSuccess: "ยอดเยี่ยมมากครับ!\n- ลดขั้นแรก 20%: เหลือ 80% ของ 2,500 = 2,000 บาท\n- ลดเงินสดอีก 10% จาก 2,000: ลดไป 200 บาท เหลือ 1,800 บาท\n[ธรรมะอุปมา]: การลดกิเลสทีละชั้น เสมือนการขัดเกลาจิตใจอย่างเป็นขั้นเป็นตอน ย่อมนำไปสู่ความเบากายเบาใจที่แท้จริง",
+      metaphorFail: "ระวังกับดักโจทย์: ห้ามนำเปอร์เซ็นต์มารวมกันเป็น 30% โดยตรงนะลูก\n1. ราคารอบแรก: 2,500 x (80/100) = 2,000 บาท\n2. ลดรอบสองจากราคาใหม่: 2,000 x (90/100) = 1,800 บาท\n[ธรรมะอุปมา]: มีสติแยกแยะเหตุปัจจัยทีละชั้น ความรอบคอบจะตัดความประมาทออกไปได้"
+    },
+    {
+      subject: "วิทยาศาสตร์กายภาพ (แรงและความดันของเหลว)",
+      q: "เพราะเหตุใดเขื่อนกักเก็บน้ำจึงต้องออกแบบให้มีฐานคอนกรีตด้านล่างหนาและกว้างกว่าส่วนสันเขื่อนด้านบนเสมอ?",
+      options: [
+        "เพื่อรองรับน้ำหนักของสันเขื่อนที่กดทับลงมา",
+        "เพราะความดันของของเหลวจะเพิ่มขึ้นตามระดับความลึก",
+        "เพื่อป้องกันไม่ให้ปลาขนาดใหญ่ว่ายชนสันเขื่อนเสียหาย",
+        "เพื่อให้ประหยัดปริมาณปูนซีเมนต์ในส่วนบน"
+      ],
+      correct: 1, // ความดันเพิ่มตามความลึก
+      metaphorSuccess: "แม่นยำยิ่ง! ความดันของเหลวแปรผันตรงกับความลึก ก้นเขื่อนจึงต้องรับแรงดันมหาศาลที่สุด\n[ธรรมะอุปมา]: ดั่งบุคคลผู้มีศีลและสมาธิเป็นฐานรากอันหนักแน่น ย่อมทานทนต่อแรงกดดันและมรสุมชีวิตได้ทุกประการ",
+      metaphorFail: "หลักฟิสิกส์สำคัญ: ยิ่งดำดิ่งลงไปลึกเท่าใด น้ำหนักน้ำที่กดทับด้านบนก็ยิ่งมาก ทำให้ 'ความดันของเหลวเพิ่มขึ้นตามความลึก'\n[ธรรมะอุปมา]: เมื่อเผชิญปัญหาที่ลึกและหนัก จงสร้างฐานจิตใจให้กว้างขวางและมั่นคงดั่งฐานเขื่อน"
+    },
+    {
+      subject: "ทักษะภาษาและการสื่อสาร (การใช้ภาษาไทยเชิงตรรกะ)",
+      q: "สำนวนใดมีความหมายใกล้เคียงกับคำว่า 'ความพยายามอยู่ที่ไหน ความสำเร็จอยู่ที่นั่น' มากที่สุด?",
+      options: [
+        "น้ำขึ้นให้รีบตัก",
+        "ฝนทั่งให้เป็นเข็ม",
+        "ไก่เห็นตีนงู งูเห็นนมไก่",
+        "ชี้โพรงให้กระรอก"
+      ],
+      correct: 1, // ฝนทั่งให้เป็นเข็ม
+      metaphorSuccess: "ถูกต้องบริบูรณ์! 'ฝนทั่งให้เป็นเข็ม' หมายถึงการเพียรพยายามทำสิ่งยากยิ่งจนสำเร็จ\n[ธรรมะอุปมา]: ตรงกับ 'วิริยะ' ในอิทธิบาท ๔ ความเพียรบริสุทธิ์ย่อมเปลี่ยนเหล็กท่อนใหญ่ให้กลายเป็นเข็มเล่มคมได้เสมอ",
+      metaphorFail: "สังเกตความหมายของสำนวน:\n- น้ำขึ้นให้รีบตัก = รีบฉวยโอกาส\n- ฝนทั่งให้เป็นเข็ม = อดทนพยายามทำงานยากจนลุล่วง\n[ธรรมะอุปมา]: ความรู้ผิดเป็นบทเรียนสำคัญ เมื่อรู้ตัวแล้วปรับจิตเข้าสู่สัมมาทิฐิ ความสำเร็จก็อยู่ไม่ไกล"
+    }
+  ];
+
+  let currentIdx = 0;
+  let correctCount = 0;
+  let xp = 0;
+
+  // โหลดแต้มสะสมเดิมจาก LocalStorage
+  window.addEventListener("DOMContentLoaded", () => {
+    const savedXp = localStorage.getItem("bodhi_xp_v4");
+    if (savedXp) {
+      xp = parseInt(savedXp, 10);
+      document.getElementById("bodhi-score").innerText = xp + " XP";
+    }
+    renderQuestion();
+  });
+
+  function renderQuestion() {
+    const q = examPool[currentIdx];
+    document.getElementById("quiz-container").style.display = "block";
+    document.getElementById("summary-box").classList.remove("active");
+    
+    document.getElementById("subject-badge").innerText = "วิชา: " + q.subject;
+    document.getElementById("question-label").innerText = (currentIdx + 1) + ". " + q.q;
+    
+    const box = document.getElementById("options-box");
+    box.innerHTML = "";
+    
+    q.options.forEach((opt, idx) => {
+      const btn = document.createElement("button");
+      btn.className = "option-btn";
+      btn.innerText = opt;
+      btn.onclick = () => evaluate(idx);
+      box.appendChild(btn);
+    });
+
+    document.getElementById("insight-console").classList.remove("active");
+    document.getElementById("next-action").style.display = "none";
+  }
+
+  function evaluate(choice) {
+    const q = examPool[currentIdx];
+    const consoleBox = document.getElementById("insight-console");
+    const terminalText = document.getElementById("insight-text");
+    const mindState = document.getElementById("mind-state");
+    const nextBtn = document.getElementById("next-action");
+
+    const btns = document.querySelectorAll(".option-btn");
+    btns.forEach(b => b.disabled = true);
+
+    consoleBox.classList.add("active");
+
+    if (choice === q.correct) {
+      xp += 50;
+      correctCount++;
+      localStorage.setItem("bodhi_xp_v4", xp);
+      btns[choice].style.borderColor = "var(--accent-green)";
+      btns[choice].style.background = "rgba(63, 185, 80, 0.2)";
+      terminalText.innerText = "STATUS: สำเร็จบริบูรณ์ (SUCCESS)\n\n" + q.metaphorSuccess;
+      mindState.innerText = "ปีติและสมาธิ";
+      mindState.style.color = "var(--accent-green)";
+    } else {
+      btns[choice].style.borderColor = "var(--accent-red)";
+      btns[choice].style.background = "rgba(248, 81, 73, 0.2)";
+      btns[q.correct].style.borderColor = "var(--accent-green)";
+      terminalText.innerText = "STATUS: วิเคราะห์จุดบกพร่อง (LEARNING OPPORTUNITY)\n\n" + q.metaphorFail;
+      mindState.innerText = "มีสติตระหนักรู้";
+      mindState.style.color = "var(--accent-gold)";
+    }
+
+    document.getElementById("bodhi-score").innerText = xp + " XP";
+    
+    const progress = Math.round(((currentIdx + 1) / examPool.length) * 100);
+    document.getElementById("progress-bar").style.width = progress + "%";
+    document.getElementById("progress-percent").innerText = progress + "%";
+
+    if (currentIdx < examPool.length - 1) {
+      nextBtn.innerText = "เข้าสู่ข้อถัดไปด้วยจิตสงบ ➔";
+      nextBtn.style.display = "inline-block";
+    } else {
+      nextBtn.innerText = "สรุปผลการประเมินปัญญา (สัมปติจฉามิ) ➔";
+      nextBtn.style.display = "inline-block";
+    }
+  }
+
+  function loadNextQuestion() {
+    if (currentIdx < examPool.length - 1) {
+      currentIdx++;
+      renderQuestion();
+    } else {
+      showSummary();
+    }
+  }
+
+  function showSummary() {
+    document.getElementById("quiz-container").style.display = "none";
+    document.getElementById("insight-console").classList.remove("active");
+    
+    const summaryBox = document.getElementById("summary-box");
+    const summaryStats = document.getElementById("summary-stats");
+    
+    summaryStats.innerHTML = `
+      ตอบถูกต้องทั้งหมด <strong>${correctCount} / ${examPool.length}</strong> ข้อ<br>
+      สะสมพลังปัญญา Bodhi Score รวม: <strong>${xp} XP</strong><br><br>
+      <em>"ขอพลังแห่งพระรัตนตรัยและบารมีหลวงพ่อฤาษีลิงดำคุ้มครองให้น้องปฐพีมีสมาธิมั่นคง ปัญญาสว่างไสว พร้อมสอบติดสาธิต มช. สมความปรารถนา"</em>
+    `;
+    summaryBox.classList.add("active");
+  }
+
+  function restartQuiz() {
+    currentIdx = 0;
+    correctCount = 0;
+    document.getElementById("progress-bar").style.width = "0%";
+    document.getElementById("progress-percent").innerText = "0%";
+    document.getElementById("mind-state").innerText = "สติมั่นคง";
+    document.getElementById("mind-state").style.color = "var(--accent-green)";
+    renderQuestion();
+  }
+</script>
+</body>
+</html>
